@@ -1,0 +1,40 @@
+name: Refresh fleet data
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fleet-data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch Whip Around and update board
+        env:
+          WHIPAROUND_API_KEY: ${{ secrets.WHIPAROUND_API_KEY }}
+        run: python3 scripts/refresh_board.py
+
+      - name: Commit fresh data
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "Board data is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Hourly refresh: sync live Whip Around data"
+          git push
