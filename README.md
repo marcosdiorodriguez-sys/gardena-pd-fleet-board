@@ -16,9 +16,11 @@ baked directly into a `const FLEET = [...]` block in the page's own
 `<script>`. There is no backend and no build step.
 
 An hourly GitHub Actions workflow pulls fresh data from Whip Around, recomputes
-each vehicle's status, and commits an updated `index.html` to the default
-branch. GitHub Pages redeploys automatically on every push, so no personal
-computer needs to be on.
+each vehicle's status, commits an updated `index.html` to the default branch,
+and deploys that same updated page to GitHub Pages. The refresh workflow
+deploys directly because GitHub deliberately does not start a second workflow
+from a commit made by its built-in Actions token. No personal computer needs to
+be on.
 
 ## One-time GitHub setup
 

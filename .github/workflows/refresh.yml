@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: fleet-data-refresh
@@ -14,6 +16,9 @@ concurrency:
 
 jobs:
   refresh:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -38,3 +43,17 @@ jobs:
           git add index.html
           git commit -m "Hourly refresh: sync live Whip Around data"
           git push
+
+      # A push made with GITHUB_TOKEN intentionally does not start pages.yml,
+      # so the scheduled workflow deploys its updated workspace directly.
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
