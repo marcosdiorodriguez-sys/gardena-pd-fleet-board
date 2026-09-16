@@ -1,10 +1,6 @@
 name: Refresh fleet data
 
 on:
-  schedule:
-    # GitHub's scheduler is best-effort. Four off-peak attempts per hour make
-    # a delayed or dropped cron event far less likely to leave the board stale.
-    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -47,7 +43,7 @@ jobs:
           git push
 
       # A push made with GITHUB_TOKEN intentionally does not start pages.yml,
-      # so the scheduled workflow deploys its updated workspace directly.
+      # so this refresh workflow deploys its updated workspace directly.
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
