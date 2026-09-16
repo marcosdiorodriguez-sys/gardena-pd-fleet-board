@@ -15,8 +15,8 @@ This is a fully static page — `index.html` is the whole site, with its data
 baked directly into a `const FLEET = [...]` block in the page's own
 `<script>`. There is no backend and no build step.
 
-An hourly GitHub Actions workflow pulls fresh data from Whip Around, recomputes
-each vehicle's status, commits an updated `index.html` to the default branch,
+GitHub Actions checks for fresh data every 15 minutes, pulls from Whip Around,
+recomputes each vehicle's status, commits an updated `index.html` to the default branch,
 and deploys that same updated page to GitHub Pages. The refresh workflow
 deploys directly because GitHub deliberately does not start a second workflow
 from a commit made by its built-in Actions token. No personal computer needs to
@@ -36,9 +36,11 @@ permissions** if the repository's current policy does not already permit it.
 If `main` has branch protection, allow GitHub Actions to push or exempt this
 workflow's bot commits.
 
-The schedule is hourly at minute 17. GitHub may start scheduled workflows a few
-minutes late during busy periods. A failed fetch exits before changing the page,
-leaving the prior good data and its visible "last pulled" timestamp in place.
+The scheduler makes four off-peak attempts per hour. GitHub schedules are
+best-effort and may occasionally start late or drop an individual event; the
+additional attempts keep one missed event from leaving the board stale for an
+extended period. A failed fetch exits before changing the page, leaving the
+prior good data and its visible "last pulled" timestamp in place.
 
 The implementation is in `scripts/refresh_board.py`; its status calculations
 preserve the existing 500-mile / 14-day due-soon window and 7-day scheduled
