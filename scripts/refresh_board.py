@@ -88,16 +88,19 @@ def build_fleet(assets: list[dict], services: list[dict], now: datetime) -> list
             schedule = service.get("schedule") or {}
             due_date = parse_date(schedule.get("date"))
             days_until = int((due_date - now).total_seconds() / 86400 + 0.5) if due_date else None
-            status = service.get("status")
+            status = str(service.get("status") or "").strip().casefold().replace("_", " ").replace("-", " ")
             title = service.get("title") or "Unnamed service"
 
-            if status in ("Active", "Overdue") and days_until is not None and 0 <= days_until <= DUE_THIS_WEEK_DAYS:
+            if status in ("active", "due soon", "overdue") and days_until is not None and 0 <= days_until <= DUE_THIS_WEEK_DAYS:
                 scheduled_this_week.append({"title": title, "dueDate": schedule.get("date")})
 
-            if status == "Overdue":
+            if status == "overdue":
                 overdue.append(title)
                 continue
-            if status != "Active":
+            if status == "due soon":
+                due_soon.append(title)
+                continue
+            if status != "active":
                 continue
 
             scheduled_odometer = schedule.get("odometer")

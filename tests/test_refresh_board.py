@@ -30,6 +30,19 @@ class RefreshBoardTests(unittest.TestCase):
         self.assertEqual(fleet[0]["scheduledThisWeek"][0]["title"], "Inspection")
         self.assertEqual(fleet[0]["engineHours"], 12.5)
 
+    def test_preserves_whip_around_due_soon_status(self):
+        services = [
+            {
+                "asset_name": "P1",
+                "title": "Oil Change",
+                "status": "Due Soon",
+                "schedule": {"odometer": 10449},
+            }
+        ]
+        fleet = build_fleet([self.asset], services, self.now)
+        self.assertEqual(fleet[0]["dueSoonCount"], 1)
+        self.assertEqual(fleet[0]["dueSoonServices"], ["Oil Change"])
+
     def test_filters_other_teams(self):
         other = dict(self.asset, team={"name": "Parks and Recreation"})
         self.assertEqual(build_fleet([other], [], self.now), [])
