@@ -280,6 +280,8 @@
     gap: 12px;
   }
   .card {
+    width: 100%;
+    min-width: 0;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -292,10 +294,13 @@
     padding: 0;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     transition: transform .12s ease, border-color .12s ease;
   }
   .card:hover { transform: translateY(-2px); border-color: var(--line-strong); }
   .card-head {
+    width: 100%;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -326,7 +331,7 @@
   .status-tag.critical { background: var(--critical); color: var(--critical-ink); }
   .status-tag.warning { background: var(--warning); color: var(--warning-ink); }
   .status-tag.info { background: var(--info); color: var(--info-ink); }
-  .card-body { padding: 8px 12px 12px; flex: 1; }
+  .card-body { width: 100%; min-width: 0; padding: 8px 12px 12px; flex: 1; }
   .item-line {
     display: flex;
     align-items: baseline;
