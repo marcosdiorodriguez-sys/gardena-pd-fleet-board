@@ -27,6 +27,8 @@ class RefreshBoardTests(unittest.TestCase):
         fleet = build_fleet([self.asset], services, self.now)
         self.assertEqual(fleet[0]["overdueServices"], ["Oil"])
         self.assertEqual(fleet[0]["dueSoonServices"], ["Tires", "Inspection"])
+        self.assertEqual(fleet[0]["dueSoonDetails"][0]["milesRemaining"], 400)
+        self.assertIsNone(fleet[0]["dueSoonDetails"][1]["milesRemaining"])
         self.assertEqual(fleet[0]["scheduledThisWeek"][0]["title"], "Inspection")
         self.assertEqual(fleet[0]["engineHours"], 12.5)
 
@@ -42,6 +44,7 @@ class RefreshBoardTests(unittest.TestCase):
         fleet = build_fleet([self.asset], services, self.now)
         self.assertEqual(fleet[0]["dueSoonCount"], 1)
         self.assertEqual(fleet[0]["dueSoonServices"], ["Oil Change"])
+        self.assertEqual(fleet[0]["dueSoonDetails"], [{"title": "Oil Change", "milesRemaining": 449}])
 
     def test_filters_other_teams(self):
         other = dict(self.asset, team={"name": "Parks and Recreation"})

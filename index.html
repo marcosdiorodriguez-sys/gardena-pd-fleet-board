@@ -594,7 +594,9 @@ function cardHTML(v, mode) {
   const items = st === 'critical'
     ? v.overdueServices.map(t => ({t, cls:'critical'}))
     : st === 'warning'
-      ? v.dueSoonServices.map(t => ({t, cls:'warning'}))
+      ? ((v.dueSoonDetails || []).length
+        ? v.dueSoonDetails.map(it => ({t: it.title, cls:'warning', milesRemaining: it.milesRemaining}))
+        : v.dueSoonServices.map(t => ({t, cls:'warning'})))
       : st === 'info'
         ? (v.scheduledThisWeek || []).map(it => ({t: it.title, cls:'info', due: it.dueDate}))
         : [];
@@ -606,7 +608,7 @@ function cardHTML(v, mode) {
         (st !== 'good' ? '<span class="status-tag ' + st + '">' + (st==='critical'?'Overdue':st==='warning'?'Due soon':'This week') + '</span>' : '') +
       '</div>' +
       '<div class="card-body">' +
-        items.map(it => '<div class="item-line"><span class="idot ' + it.cls + '"></span><span class="item-title">' + it.t + '</span>' + (it.due ? '<span class="item-due mono">' + fmtShortDate(it.due) + '</span>' : '') + '</div>').join('') +
+        items.map(it => '<div class="item-line"><span class="idot ' + it.cls + '"></span><span class="item-title">' + it.t + '</span>' + (it.milesRemaining !== null && it.milesRemaining !== undefined ? '<span class="item-due mono">' + Number(it.milesRemaining).toLocaleString() + ' mi remaining</span>' : it.due ? '<span class="item-due mono">' + fmtShortDate(it.due) + '</span>' : '') + '</div>').join('') +
         (v.outOfService ? '<div class="item-line"><span class="idot" style="background:var(--ink-faint)"></span><span class="item-title" style="color:var(--ink-faint)">Currently out of service</span></div>' : '') +
       '</div>' +
     '</button>'
@@ -708,7 +710,9 @@ function openModal(unit) {
   const st = statusOf(v);
   const pendingItems = [
     ...v.overdueServices.map(t => ({t, cls: 'critical', label: 'Overdue'})),
-    ...v.dueSoonServices.map(t => ({t, cls: 'warning', label: 'Due soon'})),
+    ...((v.dueSoonDetails || []).length
+      ? v.dueSoonDetails.map(it => ({t: it.title, cls: 'warning', label: it.milesRemaining !== null && it.milesRemaining !== undefined ? Number(it.milesRemaining).toLocaleString() + ' mi remaining' : 'Due soon'}))
+      : v.dueSoonServices.map(t => ({t, cls: 'warning', label: 'Due soon'}))),
     ...(v.scheduledThisWeek || []).map(it => ({t: it.title, cls: 'info', label: 'Due ' + fmtShortDate(it.dueDate)})),
   ];
   modalCard.innerHTML =
