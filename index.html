@@ -596,12 +596,13 @@ function fmtShortDate(s) {
 
 function cardHTML(v, mode) {
   const st = mode || statusOf(v);
+  const dueSoonItems = (v.dueSoonDetails || []).length
+    ? v.dueSoonDetails.map(it => ({t: it.title, cls:'warning', milesRemaining: it.milesRemaining}))
+    : v.dueSoonServices.map(t => ({t, cls:'warning'}));
   const items = st === 'critical'
-    ? v.overdueServices.map(t => ({t, cls:'critical'}))
+    ? v.overdueServices.map(t => ({t, cls:'critical'})).concat(dueSoonItems)
     : st === 'warning'
-      ? ((v.dueSoonDetails || []).length
-        ? v.dueSoonDetails.map(it => ({t: it.title, cls:'warning', milesRemaining: it.milesRemaining}))
-        : v.dueSoonServices.map(t => ({t, cls:'warning'})))
+      ? dueSoonItems
       : st === 'info'
         ? (v.scheduledThisWeek || []).map(it => ({t: it.title, cls:'info', due: it.dueDate}))
         : [];
